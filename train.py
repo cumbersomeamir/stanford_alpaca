@@ -59,8 +59,12 @@ class TrainingArguments(transformers.TrainingArguments):
     model_max_length: int = field(
         default=512,
         metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
+        
     )
-
+    logging_level: str = field(
+        default='INFO',
+        metadata={"help": "Define the logging level."},
+    )
 
 def smart_tokenizer_and_embedding_resize(
     special_tokens_dict: Dict,
@@ -182,6 +186,8 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, dat
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    # Set the logging level
+    logging.basicConfig(level=training_args.logging_level)
 
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
